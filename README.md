@@ -92,7 +92,7 @@ The Worker uses Cloudflare Static Assets with SPA fallback. Only `/contact/submi
 
 ## GitHub deployment
 
-`.github/workflows/deploy.yml` can deploy every push to `main` after these GitHub Actions secrets are configured:
+`.github/workflows/deploy.yml` provides a manual **Run workflow** deployment after these GitHub Actions secrets are configured:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
