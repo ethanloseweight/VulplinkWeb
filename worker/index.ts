@@ -1,6 +1,8 @@
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> }
   SUPABASE_URL: string
+  /** Public browser key. Safe to expose to the website; never use the service-role key here. */
+  SUPABASE_ANON_KEY?: string
   SUPABASE_SERVICE_ROLE_KEY: string
   SUPABASE_EMAIL_FUNCTION?: string
 }
@@ -16,8 +18,27 @@ export default {
       return handleContact(request, env)
     }
 
-    return env.ASSETS.fetch(request)
+    const asset = await env.ASSETS.fetch(request)
+    return injectPublicConfig(asset, env)
   },
+}
+
+/**
+ * Vite's import.meta.env values are fixed at build time. Injecting the public
+ * Supabase settings at the edge lets the GitHub build stay free of .env files
+ * while keeping the values managed in Cloudflare Worker variables.
+ */
+async function injectPublicConfig(response: Response, env: Env): Promise<Response> {
+  const contentType = response.headers.get('content-type') || ''
+  if (!contentType.includes('text/html') || !env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return response
+
+  const html = await response.text()
+  const config = JSON.stringify({ url: env.SUPABASE_URL, anonKey: env.SUPABASE_ANON_KEY })
+  const script = `<script>window.__VULPLINK_CONFIG__=${config};</script>`
+  const output = html.replace('</head>', `${script}</head>`)
+  const headers = new Headers(response.headers)
+  headers.set('content-length', String(new TextEncoder().encode(output).byteLength))
+  return new Response(output, { status: response.status, statusText: response.statusText, headers })
 }
 
 async function handleContact(request: Request, env: Env): Promise<Response> {
