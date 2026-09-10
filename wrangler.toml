@@ -8,7 +8,7 @@ binding = "ASSETS"
 not_found_handling = "single-page-application"
 # Let the Worker inject the public Supabase config into every HTML page.
 # The Worker still forwards normal assets to ASSETS.fetch().
-run_worker_first = [ "/contact/submit", "/*" ]
+run_worker_first = [ "/*" ]
 
 [vars]
 SUPABASE_URL = "https://tzlzyhogpcjfkjekjzjp.supabase.co"
