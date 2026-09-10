@@ -11,3 +11,6 @@ run_worker_first = [ "/contact/submit" ]
 [vars]
 SUPABASE_URL = "https://tzlzyhogpcjfkjekjzjp.supabase.co"
 SUPABASE_EMAIL_FUNCTION = "send-contact-email"
+# Public browser key. Add the value in Cloudflare Worker Settings > Variables
+# (or leave this line out and add it there); never use SUPABASE_SERVICE_ROLE_KEY.
+# SUPABASE_ANON_KEY = "your Supabase publishable/anon key"
