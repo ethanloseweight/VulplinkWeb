@@ -9,7 +9,7 @@
 - GitHub：可以管理 `ethanloseweight/VulplinkWeb`
 - Cloudflare：可以创建和管理 Workers
 - Supabase：可以管理项目、数据库、Authentication 和 Edge Functions
-- Resend：用于实际发送网站邮件，并已验证发件域名
+- Google Workspace / Gmail：用于实际发送网站邮件，建议使用 `noreply@vulplink.com`
 - 旧 WordPress：迁移正式产品和媒体时需要后台或服务器权限
 
 项目地址：<https://github.com/ethanloseweight/VulplinkWeb>
@@ -71,18 +71,21 @@ npx supabase functions deploy send-contact-email
 
 本项目的 Project ID 是 `tzlzyhogpcjfkjekjzjp`。
 
-### 5 在 Supabase 添加邮件 Secrets
+### 5 在 Supabase 添加 Gmail 邮件 Secrets
 
 打开 **Supabase Dashboard → Edge Functions → Secrets**，逐项添加：
 
 | Name | Value 从哪里取得 | 是否保密 |
 |---|---|---|
-| `RESEND_API_KEY` | Resend → API Keys → Create API Key | **是** |
-| `CONTACT_FROM_EMAIL` | 已在 Resend 验证的发件地址，例如 `Vulplink <website@vulplink.com>` | 否 |
-| `SALES_EMAIL` | 接收销售询价的邮箱 | 否 |
-| `SUPPORT_EMAIL` | 接收售后问题的邮箱 | 否 |
+| `GMAIL_CLIENT_ID` | Google Cloud OAuth 2.0 Client ID | **是** |
+| `GMAIL_CLIENT_SECRET` | Google Cloud OAuth 2.0 Client Secret | **是** |
+| `GMAIL_REFRESH_TOKEN` | Gmail OAuth 授权后取得的 refresh token | **是** |
+| `GMAIL_SENDER_EMAIL` | 实际发件账号，例如 `noreply@vulplink.com` | 否 |
+| `GMAIL_FROM_NAME` | 发件人显示名称，例如 `Vulplink` | 否 |
+| `SALES_EMAIL` | 接收销售询价的邮箱，例如 `sales@vulplink.com` | 否 |
+| `SUPPORT_EMAIL` | 接收售后问题的邮箱，例如 `support@vulplink.com` | 否 |
 
-`CONTACT_FROM_EMAIL` 的域名必须先在 Resend 验证，否则邮件会发送失败。保存这些值后不需要重新部署 Edge Function。
+本 Function 使用 Gmail API（HTTP），不需要 Resend，也不需要把 Gmail 密码放入 Supabase。若 `noreply@vulplink.com` 是别名，OAuth 必须授权它对应的主账号，并先在 Gmail 的 “Send mail as” 中添加该别名。
 
 ## 三 在 GitHub 添加部署 Secrets
 
@@ -187,7 +190,7 @@ Worker 正常运行后，在 Cloudflare 打开：
 - `SUPABASE_SERVICE_ROLE_KEY`
 - 任何 Supabase Secret key
 - `CLOUDFLARE_API_TOKEN`
-- `RESEND_API_KEY`
+- `GMAIL_CLIENT_ID`、`GMAIL_CLIENT_SECRET`、`GMAIL_REFRESH_TOKEN`
 - 管理员密码
 - `.env` 或 `.dev.vars` 中的真实值
 
@@ -221,7 +224,7 @@ Worker 正常运行后，在 Cloudflare 打开：
 
 ### 表单显示收到但邮件未发送
 
-表单资料可能已经写入数据库。检查 Supabase Edge Function 日志、`RESEND_API_KEY`、发件域名验证，以及 `SALES_EMAIL` 和 `SUPPORT_EMAIL`。
+表单资料可能已经写入数据库。检查 Supabase Edge Function 日志、Google OAuth 凭据，以及 `SALES_EMAIL` 和 `SUPPORT_EMAIL`。
 
 ### 修改 GitHub 后网站没有变化
 
