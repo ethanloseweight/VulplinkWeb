@@ -10,7 +10,7 @@ export function Admin() {
   const [session,setSession]=useState<Session|null>(null)
   const [loading,setLoading]=useState(true)
   useEffect(()=>{ void supabase.auth.getSession().then(({data})=>{setSession(data.session);setLoading(false)}); const {data}=supabase.auth.onAuthStateChange((_event,next)=>setSession(next)); return ()=>data.subscription.unsubscribe() },[])
-  if(!supabaseConfigured) return <AdminShell><div className="admin-notice">Add your Supabase URL and anonymous key to <code>.env</code> to activate the admin area.</div></AdminShell>
+  if(!supabaseConfigured) return <AdminShell><div className="admin-notice">Supabase is not configured for this deployment. Add <code>SUPABASE_ANON_KEY</code> as a Cloudflare Worker Variable, then redeploy the Worker.</div></AdminShell>
   if(loading) return <AdminShell><p>Loading…</p></AdminShell>
   if(!session) return <Login/>
   return <Dashboard/>
