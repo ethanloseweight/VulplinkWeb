@@ -20,7 +20,7 @@
 
 1. 登录 Supabase，新建项目。
 2. 打开项目右上角的 **Connect**，或进入 **Settings → API Keys**。
-3. 记录 Project URL。
+3. 记录 Project URL。本项目已经确认是 `https://tzlzyhogpcjfkjekjzjp.supabase.co`。
 4. 复制 Publishable key；如果项目仍显示旧密钥，也可以使用 `anon` key。
 5. 复制旧版 `service_role` key，留给 Cloudflare Worker 使用。
 
@@ -28,9 +28,9 @@
 
 | 稍后要填写的名称 | Supabase 中复制的值 | 是否保密 |
 |---|---|---|
-| `VITE_SUPABASE_URL` | Project URL，例如 `https://xxxx.supabase.co` | 否 |
+| `VITE_SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` | 否 |
 | `VITE_SUPABASE_ANON_KEY` | Publishable key，或旧版 `anon` key | 否，但本项目统一放在 GitHub Secrets |
-| `SUPABASE_URL` | 同一个 Project URL | 否 |
+| `SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` | 否 |
 | `SUPABASE_SERVICE_ROLE_KEY` | 旧版 `service_role` key | **是，绝不能放进 GitHub 文件** |
 
 注意：本项目现在的 Worker 代码使用变量名 `SUPABASE_SERVICE_ROLE_KEY`，所以这里必须放 `service_role`，不能放 Publishable key。Supabase 的 Publishable key 可以出现在浏览器应用中；`service_role` 具有高权限，只能在服务器端使用。
@@ -65,11 +65,11 @@ values ('把这里换成刚才复制的 User UUID');
 
 ```bash
 npx supabase login
-npx supabase link --project-ref 你的Supabase项目ID
+npx supabase link --project-ref tzlzyhogpcjfkjekjzjp
 npx supabase functions deploy send-contact-email
 ```
 
-项目 ID 是 Supabase 项目网址 `https://项目ID.supabase.co` 中的那一段。
+本项目的 Project ID 是 `tzlzyhogpcjfkjekjzjp`。
 
 ### 5 在 Supabase 添加邮件 Secrets
 
@@ -96,7 +96,7 @@ npx supabase functions deploy send-contact-email
 
 | Name | Value 从哪里取得 | 用途 |
 |---|---|---|
-| `VITE_SUPABASE_URL` | Supabase Project URL | 网站编译时连接 Supabase |
+| `VITE_SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` | 网站编译时连接 Supabase |
 | `VITE_SUPABASE_ANON_KEY` | Supabase Publishable key 或旧版 `anon` key | 网站读取公开内容及管理员登录 |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Account ID | 让 GitHub 知道部署到哪个账号 |
 | `CLOUDFLARE_API_TOKEN` | Cloudflare → Account API Tokens → Create Token | 允许 GitHub 部署 Worker |
@@ -125,7 +125,7 @@ Actions 页面：<https://github.com/ethanloseweight/VulplinkWeb/actions/workflo
 
 | Type | Name | Value |
 |---|---|---|
-| Variable | `SUPABASE_URL` | Supabase Project URL |
+| Variable | `SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` |
 | Secret | `SUPABASE_SERVICE_ROLE_KEY` | Supabase 旧版 `service_role` key |
 | Variable | `SUPABASE_EMAIL_FUNCTION` | `send-contact-email` |
 
