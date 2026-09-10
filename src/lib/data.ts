@@ -1,5 +1,5 @@
 import { supabase, supabaseConfigured } from './supabase'
-import { defaultSettings, type Category, type Product, type SiteSettings } from '../types'
+import { defaultContent, defaultSettings, type Category, type Product, type SiteSettings } from '../types'
 
 export async function getCategories(): Promise<Category[]> {
   if (!supabaseConfigured) return []
@@ -36,6 +36,7 @@ export async function getSettings(): Promise<SiteSettings> {
   return {
     ...defaultSettings,
     ...values,
+    content: { ...defaultContent, ...(values.content || {}) },
     hero_slides: values.hero_slides || [],
     about_images: values.about_images || [],
   }
