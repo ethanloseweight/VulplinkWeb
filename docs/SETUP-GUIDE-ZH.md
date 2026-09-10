@@ -29,7 +29,7 @@
 | 稍后要填写的名称 | Supabase 中复制的值 | 是否保密 |
 |---|---|---|
 | `VITE_SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` | 否 |
-| `VITE_SUPABASE_ANON_KEY` | Publishable key，或旧版 `anon` key | 否，但本项目统一放在 GitHub Secrets |
+| `VITE_SUPABASE_ANON_KEY` | Publishable key，或旧版 `anon` key | 否；Worker 运行时从 Cloudflare 注入 |
 | `SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` | 否 |
 | `SUPABASE_SERVICE_ROLE_KEY` | 旧版 `service_role` key | **是，绝不能放进 GitHub 文件** |
 
@@ -92,18 +92,18 @@ npx supabase functions deploy send-contact-email
 
 仓库：<https://github.com/ethanloseweight/VulplinkWeb/settings/secrets/actions>
 
-添加以下四项，名称必须完全一致：
+现在只需要添加两项 Cloudflare 部署凭据：
 
 | Name | Value 从哪里取得 | 用途 |
 |---|---|---|
-| `VITE_SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` | 网站编译时连接 Supabase |
-| `VITE_SUPABASE_ANON_KEY` | Supabase Publishable key 或旧版 `anon` key | 网站读取公开内容及管理员登录 |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Account ID | 让 GitHub 知道部署到哪个账号 |
 | `CLOUDFLARE_API_TOKEN` | Cloudflare → Account API Tokens → Create Token | 允许 GitHub 部署 Worker |
 
+Supabase URL 和 Publishable/anon key 不需要放在 GitHub。部署时 Worker 会从 Cloudflare Runtime Variables 注入它们。
+
 Cloudflare Token 建议选择 **Edit Cloudflare Workers**，并只授权 Vulplink 所在的 Cloudflare Account。Token 只会显示一次；复制后直接放入 GitHub Secret，不要贴到 GitHub 文件。
 
-本项目的部署流程在 [`.github/workflows/deploy.yml`](https://github.com/ethanloseweight/VulplinkWeb/blob/main/.github/workflows/deploy.yml)。这个文件只引用 Secret 名称，不应该写入真实值。
+本项目的部署流程在 [`.github/workflows/deploy.yml`](https://github.com/ethanloseweight/VulplinkWeb/blob/main/.github/workflows/deploy.yml)。
 
 ## 四 第一次部署 Cloudflare Worker
 
@@ -129,20 +129,22 @@ SUPABASE_URL = "https://tzlzyhogpcjfkjekjzjp.supabase.co"
 SUPABASE_EMAIL_FUNCTION = "send-contact-email"
 ```
 
-所以在你截图的 **Runtime variables and secrets** 区域，实际只需要添加这一项：
+所以在你截图的 **Runtime variables and secrets** 区域，需要添加以下两项：
 
 | Type | Name | Value |
 |---|---|---|
+| Variable | `SUPABASE_ANON_KEY` | Supabase Publishable key 或旧版 `anon` key |
 | Secret | `SUPABASE_SERVICE_ROLE_KEY` | Supabase 旧版 `service_role` key |
 
 操作时：
 
 1. 按右上角 **Add variable**。
 2. Name 复制表格中的名称，大小写必须完全一致。
-3. `SUPABASE_SERVICE_ROLE_KEY` 的 Type 必须选 **Secret**。
+3. `SUPABASE_ANON_KEY` 的 Type 选 **Variable**；它是公开浏览器密钥。
+4. `SUPABASE_SERVICE_ROLE_KEY` 的 Type 必须选 **Secret**。
 4. 保存后不要截图显示 Secret 的值。
 
-`SUPABASE_URL` 和 `SUPABASE_EMAIL_FUNCTION` 已经在 `wrangler.toml` 中维护；`VITE_SUPABASE_URL` 和 `VITE_SUPABASE_ANON_KEY` 不用加在这个 Cloudflare Runtime 页面，因为它们是在 GitHub Actions 编译网站时读取的。
+`SUPABASE_URL` 和 `SUPABASE_EMAIL_FUNCTION` 已经在 `wrangler.toml` 中维护。`SUPABASE_ANON_KEY` 由 Worker 在请求 HTML 时注入给浏览器，因此 GitHub 不需要 `.env` 或 `VITE_*` Secret。
 
 ## 六 域名设置
 
@@ -211,11 +213,11 @@ Worker 正常运行后，在 Cloudflare 打开：
 
 ### GitHub Action 显示红色
 
-先打开失败步骤。最常见原因是四个 GitHub Secret 缺失、名称拼错，或 Cloudflare Token 没有 Worker 编辑权限。
+先打开失败步骤。最常见原因是两个 Cloudflare GitHub Secret 缺失、名称拼错，或 Cloudflare Token 没有 Worker 编辑权限。
 
 ### 网站打开但没有产品
 
-检查 `VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY`，并确认数据库 SQL 已执行、产品的 `published` 为 true。
+检查 Cloudflare Runtime Variables 中的 `SUPABASE_URL`、`SUPABASE_ANON_KEY`，并确认数据库 SQL 已执行、产品的 `published` 为 true。
 
 ### 表单显示收到但邮件未发送
 
