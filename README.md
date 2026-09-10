@@ -2,6 +2,8 @@
 
 This repository migrates the supplied `vulplink-v2` WordPress theme to one Cloudflare Worker while preserving the public visual system and product functionality.
 
+中文交接和逐步设置说明：[`docs/SETUP-GUIDE-ZH.md`](docs/SETUP-GUIDE-ZH.md)
+
 ## URLs
 
 - `/` — public website home
