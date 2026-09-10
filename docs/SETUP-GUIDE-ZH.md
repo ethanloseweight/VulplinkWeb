@@ -121,23 +121,28 @@ Actions 页面：<https://github.com/ethanloseweight/VulplinkWeb/actions/workflo
 
 **Cloudflare Dashboard → Workers & Pages → vulplink → Settings → Variables and Secrets → Add variable**
 
-在你截图的 **Runtime variables and secrets** 区域添加以下三项：
+本项目已经把两个不敏感的值写入 GitHub 的 [`wrangler.toml`](https://github.com/ethanloseweight/VulplinkWeb/blob/main/wrangler.toml)，部署时会自动带入：
+
+```toml
+[vars]
+SUPABASE_URL = "https://tzlzyhogpcjfkjekjzjp.supabase.co"
+SUPABASE_EMAIL_FUNCTION = "send-contact-email"
+```
+
+所以在你截图的 **Runtime variables and secrets** 区域，实际只需要添加这一项：
 
 | Type | Name | Value |
 |---|---|---|
-| Variable | `SUPABASE_URL` | `https://tzlzyhogpcjfkjekjzjp.supabase.co` |
 | Secret | `SUPABASE_SERVICE_ROLE_KEY` | Supabase 旧版 `service_role` key |
-| Variable | `SUPABASE_EMAIL_FUNCTION` | `send-contact-email` |
 
 操作时：
 
 1. 按右上角 **Add variable**。
 2. Name 复制表格中的名称，大小写必须完全一致。
 3. `SUPABASE_SERVICE_ROLE_KEY` 的 Type 必须选 **Secret**。
-4. 其他两项可以选 **Variable**。
-5. 保存后不要截图显示 Secret 的值。
+4. 保存后不要截图显示 Secret 的值。
 
-`VITE_SUPABASE_URL` 和 `VITE_SUPABASE_ANON_KEY` 不用加在这个 Cloudflare Runtime 页面，因为它们是在 GitHub Actions 编译网站时读取的。
+`SUPABASE_URL` 和 `SUPABASE_EMAIL_FUNCTION` 已经在 `wrangler.toml` 中维护；`VITE_SUPABASE_URL` 和 `VITE_SUPABASE_ANON_KEY` 不用加在这个 Cloudflare Runtime 页面，因为它们是在 GitHub Actions 编译网站时读取的。
 
 ## 六 域名设置
 
